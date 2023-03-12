@@ -2,7 +2,7 @@
 pragma solidity ^0.8.15;
 
 // testing libraries
-import "@forge-std/Test.sol";
+import "forge-std/Test.sol";
 
 // contract dependencies
 import {Contract} from "../Contract.sol";
