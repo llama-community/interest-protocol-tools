@@ -5,7 +5,7 @@ import {Script} from "forge-std/Script.sol";
 import {GenericListing} from "../src/listings/GenericListing.sol";
 import {IPEthereum} from "../src/address-book/IPEthereum.sol";
 
-contract DeployContract is Script {
+contract DeployToken is Script {
     address private constant underlyingToken = 0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2;
     address private cappedToken;
     address private oracleOne;
@@ -22,7 +22,6 @@ contract DeployContract is Script {
     }
 
     function _deployCappedToken() internal {
-        // Edit the three values below for a new capped listing
         GenericListing.ListingData memory data = GenericListing.ListingData({
             tokenName: "MKR",
             underlying: underlyingToken,
@@ -32,7 +31,6 @@ contract DeployContract is Script {
     }
 
     function _deployOracles() internal {
-        //Edit the values here or add different oracle to deploy
         GenericListing.ChainlinkOracleData memory chainlinkData = GenericListing.ChainlinkOracleData({
             oracle: 0xec1D1B3b0443256cc3860e24a46F108e699484Aa,
             ethOracle: false,

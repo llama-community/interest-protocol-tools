@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 
 import {IPEthereum} from "../address-book/IPAddressBook.sol";
 import {IPGovernance} from "../address-book/IPAddressBook.sol";
-import {IGenericListing} from "./IGenericListing.sol";
 import {CappedGovToken} from "ip-contracts/lending/CappedGovToken.sol";
 import {TransparentUpgradeableProxy} from "ip-contracts/_external/ozproxy/transparent/TransparentUpgradeableProxy.sol";
 import {ChainlinkOracleRelay} from "ip-contracts/oracle/External/ChainlinkOracleRelay.sol";
@@ -13,10 +12,11 @@ import {UniswapV3TokenOracleRelay} from "ip-contracts/oracle/External/UniswapV3T
 import {AnchoredViewV2} from "ip-contracts/oracle/Logic/AnchoredViewV2.sol";
 
 library GenericListing {
-    error NonEmptyName();
     error Invalid0xAddress();
     error InvalidCap();
     error InvalidInput();
+    error NoDescriptionProvided();
+    error NonEmptyName();
 
     struct ListingData {
         string tokenName;
@@ -57,6 +57,10 @@ library GenericListing {
     }
 
     function propose(ProposalData calldata data) external {
+        if (bytes(data.description).length < 1) {
+            revert NoDescriptionProvided();
+        }
+
         uint256 targetsLength = data.targets.length;
         if (targetsLength == 0) {
             revert InvalidInput();
