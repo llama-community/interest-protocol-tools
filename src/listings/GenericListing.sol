@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {IPEthereum} from "../address-book/IPAddressBook.sol";
-import {IPGovernance} from "../address-book/IPAddressBook.sol";
+import "forge-std/console.sol";
+
+import {IPEthereum, IPGovernance} from "../address-book/IPAddressBook.sol";
 import {CappedGovToken} from "ip-contracts/lending/CappedGovToken.sol";
 import {TransparentUpgradeableProxy} from "ip-contracts/_external/ozproxy/transparent/TransparentUpgradeableProxy.sol";
 import {ChainlinkOracleRelay} from "ip-contracts/oracle/External/ChainlinkOracleRelay.sol";
@@ -57,6 +58,7 @@ library GenericListing {
     }
 
     function propose(ProposalData calldata data) external {
+        console.log(msg.sender);
         if (bytes(data.description).length < 1) {
             revert NoDescriptionProvided();
         }
@@ -95,11 +97,7 @@ library GenericListing {
             revert InvalidCap();
         }
         CappedGovToken token = new CappedGovToken();
-        TransparentUpgradeableProxy proxy = new TransparentUpgradeableProxy(
-            address(token),
-            IPEthereum.PROXY_ADMIN,
-            "0x"
-        );
+        TransparentUpgradeableProxy proxy = new TransparentUpgradeableProxy(address(token), IPEthereum.PROXY_ADMIN, "");
         CappedGovToken cappedToken = CappedGovToken(address(proxy));
         string memory name = string(string.concat("Capped ", bytes(data.tokenName)));
         string memory symbol = string(string.concat("c", bytes(data.tokenName)));
