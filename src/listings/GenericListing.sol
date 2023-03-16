@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "forge-std/console.sol";
-
 import {IPEthereum, IPGovernance} from "../address-book/IPAddressBook.sol";
 import {CappedGovToken} from "ip-contracts/lending/CappedGovToken.sol";
 import {TransparentUpgradeableProxy} from "ip-contracts/_external/ozproxy/transparent/TransparentUpgradeableProxy.sol";
@@ -57,8 +55,7 @@ library GenericListing {
         bool emergency;
     }
 
-    function propose(ProposalData calldata data) external {
-        console.log(msg.sender);
+    function propose(ProposalData memory data) internal {
         if (bytes(data.description).length < 1) {
             revert NoDescriptionProvided();
         }
@@ -86,7 +83,7 @@ library GenericListing {
         );
     }
 
-    function deployCappedToken(ListingData calldata data) external returns (address) {
+    function deployCappedToken(ListingData memory data) internal returns (address) {
         if (bytes(data.tokenName).length < 1) {
             revert NonEmptyName();
         }
@@ -114,7 +111,7 @@ library GenericListing {
         return address(cappedToken);
     }
 
-    function deployChainlinkOracle(ChainlinkOracleData calldata data) external returns (address) {
+    function deployChainlinkOracle(ChainlinkOracleData memory data) internal returns (address) {
         if (data.oracle == address(0)) {
             revert Invalid0xAddress();
         }
@@ -127,7 +124,7 @@ library GenericListing {
         }
     }
 
-    function deployUniswapV3Oracle(UniswapV3OracleData calldata data) external returns (address) {
+    function deployUniswapV3Oracle(UniswapV3OracleData memory data) internal returns (address) {
         if (data.pool == address(0)) {
             revert Invalid0xAddress();
         }
@@ -152,7 +149,7 @@ library GenericListing {
         }
     }
 
-    function deployAnchoredOracle(AnchoredViewRelayData calldata data) external returns (address) {
+    function deployAnchoredOracle(AnchoredViewRelayData memory data) internal returns (address) {
         if (data.anchor == address(0) || data.main == address(0)) {
             revert Invalid0xAddress();
         }

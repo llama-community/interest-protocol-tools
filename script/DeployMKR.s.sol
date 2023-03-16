@@ -14,11 +14,15 @@ contract DeployToken is Script {
 
     function run() external {
         vm.startBroadcast();
+        _deployAll();
+        vm.stopBroadcast();
+    }
+
+    function _deployAll() public {
         _deployCappedToken();
         _deployOracles();
         _deployAnchor();
         _propose();
-        vm.stopBroadcast();
     }
 
     function _deployCappedToken() internal {
@@ -62,7 +66,14 @@ contract DeployToken is Script {
 
     function _propose() internal {
         GenericListing.propose(
-            GenericListing.ProposalData(_getTargets(), _getValues(), _getSignatures(), _getCalldatas(), "", false)
+            GenericListing.ProposalData(
+                _getTargets(),
+                _getValues(),
+                _getSignatures(),
+                _getCalldatas(),
+                "my description", // TODO: Read file from here
+                false
+            )
         );
     }
 
