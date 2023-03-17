@@ -4,6 +4,11 @@ pragma solidity >=0.8.0;
 interface IVaultController {
     function _enabledTokens(uint256 id) external view returns (address);
 
+    /// @notice borrow USDi from a vault. only vault minter may borrow from their vault
+    /// @param id vault to borrow against
+    /// @param amount amount of USDi to borrow
+    function borrowUsdi(uint96 id, uint192 amount) external;
+
     /// @notice create a new vault
     /// @return address of the new vault
     function mintVault() external returns (address);
@@ -27,6 +32,18 @@ interface IVaultController {
     /// @notice get vault address of id
     /// @return the address of vault
     function vaultAddress(uint96 id) external view returns (address);
+
+    /// @notice get vault borrowing power for vault
+    /// @param id id of vault
+    /// @return amount of USDi the vault can borrow
+    /// @dev implementation in get_vault_borrowing_power
+    function vaultBorrowingPower(uint96 id) external view returns (uint192);
+
+    /// @notice get vault liability of vault
+    /// @param id id of vault
+    /// @return amount of USDi the vault owes
+    /// @dev implementation _vaultLiability
+    function vaultLiability(uint96 id) external view returns (uint192);
 
     /// @notice get the amount of vaults in the system
     /// @return the amount of vaults in the system
