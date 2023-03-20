@@ -273,6 +273,7 @@ contract Propose is GenericListingTest {
 }
 
 contract MKRProposalTest is BaseInterestProtocolTest {
+    address private constant MKR_WHALE = 0xA9DDA2045D140Eb7CCD30c4EF6B9901CCb279793;
     address private constant underlyingToken = 0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2;
     address private cappedToken;
     address private oracleOne;
@@ -317,6 +318,9 @@ contract MKRProposalTest is BaseInterestProtocolTest {
 
         _deposit(token, msg.sender, 1e18, vaultId);
         _borrow(msg.sender, 5e17, vaultId);
+        _repay(msg.sender, vaultId);
+
+        _delegate(token, msg.sender, vaultId, MKR_WHALE);
     }
 
     function _createMKRProposal(address underlying, uint256 proposedCap) internal returns (uint256) {

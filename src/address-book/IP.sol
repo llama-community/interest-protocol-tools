@@ -25,6 +25,11 @@ interface IVaultController {
         uint256 liquidationIncentive
     ) external;
 
+    /// @notice repay all of a vault's USDi. anyone may repay a vault's liabilities
+    /// @param id the vault to repay
+    /// @dev pays interest
+    function repayAllUSDi(uint96 id) external;
+
     /// @notice get the amount of tokens regsitered in the system
     /// @return the amount of tokens registered in the system
     function tokensRegistered() external view returns (uint256);

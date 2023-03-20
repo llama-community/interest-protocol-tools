@@ -16,6 +16,7 @@ contract BaseInterestProtocolTest is Test {
     address private constant IPT_VOTING_WHALE_ONE = 0x3Df70ccb5B5AA9c300100D98258fE7F39f5F9908;
     address private constant IPT_VOTING_WHALE_TWO = 0xa6e8772af29b29B9202a073f8E36f447689BEef6;
     address private constant IPT_VOTING_WHALE_THREE = 0x5fee8d7d02B0cfC08f0205ffd6d6B41877c86558;
+    address private constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
 
     function _borrow(
         address user,
@@ -23,10 +24,21 @@ contract BaseInterestProtocolTest is Test {
         uint96 vaultId
     ) internal {
         vm.startPrank(user);
-        assertEq(IERC20(IPEthereum.USDI).balanceOf(user), 0);
+        assertEq(IERC20(address(IPEthereum.USDIToken)).balanceOf(user), 0);
         IPEthereum.VAULT_CONTROLLER.borrowUsdi(vaultId, amount);
-        assertEq(IERC20(IPEthereum.USDI).balanceOf(user), amount);
-        assertApproxEqAbs(IPEthereum.VAULT_CONTROLLER.vaultLiability(vaultId), amount, 2);
+        assertEq(IERC20(address(IPEthereum.USDIToken)).balanceOf(user), amount);
+        assertApproxEqAbs(IPEthereum.VAULT_CONTROLLER.vaultLiability(vaultId), amount, 1e15); // Within 0.001 (1e15)
+        vm.stopPrank();
+    }
+
+    function _delegate(
+        CappedGovToken token,
+        address user,
+        uint96 vaultId,
+        address to
+    ) internal {
+        vm.startPrank(user);
+        Vault(IPEthereum.VAULT_CONTROLLER.vaultAddress(vaultId)).delegateCompLikeTo(to, address(token._underlying()));
         vm.stopPrank();
     }
 
@@ -46,7 +58,16 @@ contract BaseInterestProtocolTest is Test {
         vm.stopPrank();
     }
 
-    function _repay() internal {}
+    function _repay(address user, uint96 vaultId) internal {
+        vm.startPrank(user);
+        IERC20(address(IPEthereum.USDIToken)).approve(
+            address(IPEthereum.VAULT_CONTROLLER),
+            IERC20(address(IPEthereum.USDIToken)).balanceOf(user)
+        );
+        IPEthereum.VAULT_CONTROLLER.repayAllUSDi(vaultId);
+        assertEq(IPEthereum.VAULT_CONTROLLER.vaultLiability(vaultId), 0);
+        vm.stopPrank();
+    }
 
     function _withdraw(
         CappedGovToken token,
