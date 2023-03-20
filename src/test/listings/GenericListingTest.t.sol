@@ -12,7 +12,7 @@ import {UniswapV3TokenOracleRelay} from "ip-contracts/oracle/External/UniswapV3T
 import {AnchoredViewV2} from "ip-contracts/oracle/Logic/AnchoredViewV2.sol";
 
 import {GenericListing} from "../../listings/GenericListing.sol";
-import {IPGovernance, IPEthereum} from "../../address-book/IPAddressBook.sol";
+import {IPGovernance, IPMainnet} from "../../address-book/IPAddressBook.sol";
 
 contract GenericListingTest is Test {
     address public constant IPT_WHALE = 0x95Bc377F540E504F666671177E5d80bf7c21ab6F;
@@ -216,7 +216,7 @@ contract Propose is GenericListingTest {
 
     function test_revertsIf_msgSenderDoesNotHaveVotes() public {
         address[] memory targets = new address[](1);
-        targets[0] = address(IPEthereum.ORACLE);
+        targets[0] = address(IPMainnet.ORACLE);
 
         uint256[] memory values = new uint256[](1);
         values[0] = 0;
@@ -245,7 +245,7 @@ contract Propose is GenericListingTest {
         assertEq(IPGovernance.GOV.proposalCount(), 19);
 
         address[] memory targets = new address[](1);
-        targets[0] = address(IPEthereum.ORACLE);
+        targets[0] = address(IPMainnet.ORACLE);
 
         uint256[] memory values = new uint256[](1);
         values[0] = 0;
@@ -286,7 +286,7 @@ contract MKRProposalTest is BaseInterestProtocolTest {
 
     function test_e2e_MKRProposal() public {
         assertEq(IPGovernance.GOV.proposalCount(), 19);
-        assertEq(IPEthereum.VAULT_CONTROLLER.tokensRegistered(), 14);
+        assertEq(IPMainnet.VAULT_CONTROLLER.tokensRegistered(), 14);
 
         uint256 proposedCap = 5_400_000;
         uint256 proposalId = _createMKRProposal(underlyingToken, proposedCap);
@@ -294,9 +294,9 @@ contract MKRProposalTest is BaseInterestProtocolTest {
         _passVoteAndExecute(proposalId);
 
         assertEq(IPGovernance.GOV.proposalCount(), 20);
-        assertEq(IPEthereum.VAULT_CONTROLLER.tokensRegistered(), 15);
+        assertEq(IPMainnet.VAULT_CONTROLLER.tokensRegistered(), 15);
 
-        address newToken = IPEthereum.VAULT_CONTROLLER._enabledTokens(14);
+        address newToken = IPMainnet.VAULT_CONTROLLER._enabledTokens(14);
 
         CappedGovToken token = CappedGovToken(newToken);
         assertEq(token.getCap(), proposedCap * 1e18);
@@ -305,16 +305,16 @@ contract MKRProposalTest is BaseInterestProtocolTest {
         assertEq(keccak256(abi.encodePacked("cMKR")), keccak256(abi.encodePacked(token.symbol())));
 
         vm.startPrank(msg.sender);
-        IPEthereum.VAULT_CONTROLLER.mintVault();
-        uint96 vaultId = IPEthereum.VAULT_CONTROLLER.vaultsMinted();
-        IPEthereum.VOTING_VAULT_CONTROLLER.mintVault(vaultId);
+        IPMainnet.VAULT_CONTROLLER.mintVault();
+        uint96 vaultId = IPMainnet.VAULT_CONTROLLER.vaultsMinted();
+        IPMainnet.VOTING_VAULT_CONTROLLER.mintVault(vaultId);
         vm.stopPrank();
 
         _deposit(token, msg.sender, 1e18, vaultId);
         _withdraw(token, msg.sender, vaultId);
 
-        assertEq(IPEthereum.VAULT_CONTROLLER.vaultLiability(vaultId), 0);
-        assertEq(IPEthereum.VAULT_CONTROLLER.vaultBorrowingPower(vaultId), 0);
+        assertEq(IPMainnet.VAULT_CONTROLLER.vaultLiability(vaultId), 0);
+        assertEq(IPMainnet.VAULT_CONTROLLER.vaultBorrowingPower(vaultId), 0);
 
         _deposit(token, msg.sender, 1e18, vaultId);
         _borrow(msg.sender, 5e17, vaultId);
@@ -358,9 +358,9 @@ contract MKRProposalTest is BaseInterestProtocolTest {
         anchor = GenericListing.deployAnchoredOracle(data);
 
         address[] memory targets = new address[](3);
-        targets[0] = address(IPEthereum.ORACLE);
-        targets[1] = address(IPEthereum.VAULT_CONTROLLER);
-        targets[2] = address(IPEthereum.VOTING_VAULT_CONTROLLER);
+        targets[0] = address(IPMainnet.ORACLE);
+        targets[1] = address(IPMainnet.VAULT_CONTROLLER);
+        targets[2] = address(IPMainnet.VOTING_VAULT_CONTROLLER);
 
         uint256[] memory values = new uint256[](3);
         values[0] = 0;

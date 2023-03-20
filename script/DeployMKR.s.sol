@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import {Script} from "forge-std/Script.sol";
 import {GenericListing} from "../src/listings/GenericListing.sol";
-import {IPEthereum} from "../src/address-book/IPEthereum.sol";
+import {IPMainnet} from "../src/address-book/IPMainnet.sol";
 
 contract DeployToken is Script {
     address private constant underlyingToken = 0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2;
@@ -14,15 +14,11 @@ contract DeployToken is Script {
 
     function run() external {
         vm.startBroadcast();
-        _deployAll();
-        vm.stopBroadcast();
-    }
-
-    function _deployAll() public {
         _deployCappedToken();
         _deployOracles();
         _deployAnchor();
         _propose();
+        vm.stopBroadcast();
     }
 
     function _deployCappedToken() internal {
@@ -71,7 +67,7 @@ contract DeployToken is Script {
                 _getValues(),
                 _getSignatures(),
                 _getCalldatas(),
-                "my description", // TODO: Read file from here
+                vm.readFile("./script/proposal.md"),
                 false
             )
         );
@@ -79,9 +75,9 @@ contract DeployToken is Script {
 
     function _getTargets() internal pure returns (address[] memory) {
         address[] memory targets = new address[](3);
-        targets[0] = address(IPEthereum.ORACLE);
-        targets[1] = address(IPEthereum.VAULT_CONTROLLER);
-        targets[2] = address(IPEthereum.VOTING_VAULT_CONTROLLER);
+        targets[0] = address(IPMainnet.ORACLE);
+        targets[1] = address(IPMainnet.VAULT_CONTROLLER);
+        targets[2] = address(IPMainnet.VOTING_VAULT_CONTROLLER);
         return targets;
     }
 

@@ -9,7 +9,7 @@ import {CappedGovToken} from "ip-contracts/lending/CappedGovToken.sol";
 import {Vault} from "ip-contracts/lending/Vault.sol";
 import {ProposalState} from "ip-contracts/governance/governor/Structs.sol";
 
-import {IPGovernance, IPEthereum} from "../address-book/IPAddressBook.sol";
+import {IPGovernance, IPMainnet} from "../address-book/IPAddressBook.sol";
 
 contract BaseInterestProtocolTest is Test {
     address public constant IPT_WHALE = 0x95Bc377F540E504F666671177E5d80bf7c21ab6F;
@@ -24,10 +24,10 @@ contract BaseInterestProtocolTest is Test {
         uint96 vaultId
     ) internal {
         vm.startPrank(user);
-        assertEq(IERC20(address(IPEthereum.USDIToken)).balanceOf(user), 0);
-        IPEthereum.VAULT_CONTROLLER.borrowUsdi(vaultId, amount);
-        assertEq(IERC20(address(IPEthereum.USDIToken)).balanceOf(user), amount);
-        assertApproxEqAbs(IPEthereum.VAULT_CONTROLLER.vaultLiability(vaultId), amount, 1e15); // Within 0.001 (1e15)
+        assertEq(IERC20(address(IPMainnet.USDIToken)).balanceOf(user), 0);
+        IPMainnet.VAULT_CONTROLLER.borrowUsdi(vaultId, amount);
+        assertEq(IERC20(address(IPMainnet.USDIToken)).balanceOf(user), amount);
+        assertApproxEqAbs(IPMainnet.VAULT_CONTROLLER.vaultLiability(vaultId), amount, 1e15); // Within 0.001 (1e15)
         vm.stopPrank();
     }
 
@@ -38,7 +38,7 @@ contract BaseInterestProtocolTest is Test {
         address to
     ) internal {
         vm.startPrank(user);
-        Vault(IPEthereum.VAULT_CONTROLLER.vaultAddress(vaultId)).delegateCompLikeTo(to, address(token._underlying()));
+        Vault(IPMainnet.VAULT_CONTROLLER.vaultAddress(vaultId)).delegateCompLikeTo(to, address(token._underlying()));
         vm.stopPrank();
     }
 
@@ -54,18 +54,18 @@ contract BaseInterestProtocolTest is Test {
         IERC20(address(token._underlying())).approve(address(token), amount);
         token.deposit(amount, vaultId);
         assertEq(token.balanceOf(user), 0);
-        assertEq(token.balanceOf(IPEthereum.VAULT_CONTROLLER.vaultAddress(vaultId)), cappedTokenBefore + amount);
+        assertEq(token.balanceOf(IPMainnet.VAULT_CONTROLLER.vaultAddress(vaultId)), cappedTokenBefore + amount);
         vm.stopPrank();
     }
 
     function _repay(address user, uint96 vaultId) internal {
         vm.startPrank(user);
-        IERC20(address(IPEthereum.USDIToken)).approve(
-            address(IPEthereum.VAULT_CONTROLLER),
-            IERC20(address(IPEthereum.USDIToken)).balanceOf(user)
+        IERC20(address(IPMainnet.USDIToken)).approve(
+            address(IPMainnet.VAULT_CONTROLLER),
+            IERC20(address(IPMainnet.USDIToken)).balanceOf(user)
         );
-        IPEthereum.VAULT_CONTROLLER.repayAllUSDi(vaultId);
-        assertEq(IPEthereum.VAULT_CONTROLLER.vaultLiability(vaultId), 0);
+        IPMainnet.VAULT_CONTROLLER.repayAllUSDi(vaultId);
+        assertEq(IPMainnet.VAULT_CONTROLLER.vaultLiability(vaultId), 0);
         vm.stopPrank();
     }
 
@@ -75,11 +75,11 @@ contract BaseInterestProtocolTest is Test {
         uint96 vaultId
     ) internal {
         vm.startPrank(user);
-        uint256 amountToWithdraw = token.balanceOf(IPEthereum.VAULT_CONTROLLER.vaultAddress(vaultId));
+        uint256 amountToWithdraw = token.balanceOf(IPMainnet.VAULT_CONTROLLER.vaultAddress(vaultId));
         uint256 underlyingBalanceBefore = IERC20(address(token._underlying())).balanceOf(user);
-        Vault(IPEthereum.VAULT_CONTROLLER.vaultAddress(vaultId)).withdrawErc20(address(token), amountToWithdraw);
+        Vault(IPMainnet.VAULT_CONTROLLER.vaultAddress(vaultId)).withdrawErc20(address(token), amountToWithdraw);
         assertEq(IERC20(address(token._underlying())).balanceOf(user), underlyingBalanceBefore + amountToWithdraw);
-        assertEq(token.balanceOf(IPEthereum.VAULT_CONTROLLER.vaultAddress(vaultId)), 0);
+        assertEq(token.balanceOf(IPMainnet.VAULT_CONTROLLER.vaultAddress(vaultId)), 0);
         vm.stopPrank();
     }
 

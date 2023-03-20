@@ -13,8 +13,8 @@ match    :; forge clean && forge test --etherscan-api-key ${ETHERSCAN_API_KEY} -
 report   :; forge clean && forge test --gas-report | sed -e/╭/\{ -e:1 -en\;b1 -e\} -ed | cat > .gas-report
 
 # Deploy and Verify Contract
-deploy-contract :; forge script script/DeployContract.s.sol:DeployContract --rpc-url ${RPC_MAINNET_URL} --broadcast --private-key ${PRIVATE_KEY} --verify --etherscan-api-key ${ETHERSCAN_API_KEY} -vvvv
-verify-contract :; forge script script/DeployContract.s.sol:DeployContract --rpc-url ${RPC_MAINNET_URL} --verify --etherscan-api-key ${ETHERSCAN_API_KEY} -vvvv
+deploy-contract :; forge script script/DeployMKR.s.sol:DeployToken --rpc-url ${RPC_MAINNET_URL} --broadcast --private-key ${PRIVATE_KEY} --verify --etherscan-api-key ${ETHERSCAN_API_KEY} -vvvv
+verify-contract :; forge script script/DeployMKR.s.sol:DeployToken --rpc-url ${RPC_MAINNET_URL} --verify --etherscan-api-key ${ETHERSCAN_API_KEY} -vvvv
 
 # Clean & lint
 clean    :; forge clean

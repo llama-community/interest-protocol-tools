@@ -8,6 +8,7 @@ libs = ['lib']
 src = 'src'
 test = 'test'
 out = 'out'
+fs_permissions = [{access = "read", path = "./script"}]
 
 [rpc_endpoints]
 mainnet = "${RPC_MAINNET_URL}"
