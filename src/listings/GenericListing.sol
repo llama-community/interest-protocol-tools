@@ -107,6 +107,7 @@ library GenericListing {
             address(IPMainnet.VOTING_VAULT_CONTROLLER)
         );
         cappedToken.setCap(data.cap * 1e18);
+        cappedToken.transferOwnership(address(IPGovernance.GOV));
 
         return address(cappedToken);
     }

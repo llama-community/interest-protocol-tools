@@ -54,6 +54,7 @@ contract DeployCappedtoken is GenericListingTest {
         assertEq(address(token._underlying()), ONEINCH);
         assertEq(keccak256(abi.encodePacked("Capped 1INCH")), keccak256(abi.encodePacked(token.name())));
         assertEq(keccak256(abi.encodePacked("c1INCH")), keccak256(abi.encodePacked(token.symbol())));
+        assertEq(token.owner(), address(IPGovernance.GOV));
     }
 }
 
