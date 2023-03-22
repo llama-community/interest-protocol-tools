@@ -16,6 +16,15 @@ contract VaultMKRTest is Test {
         vm.createSelectFork(vm.rpcUrl("mainnet"), 16819412);
     }
 
+    function test_delegateTo_revertsOnlyMinter() public {
+        uint256 delegateAmount = 5e18;
+        VaultMKR vault = new VaultMKR(VAULT_ID, msg.sender, address(IPMainnet.VAULT_CONTROLLER));
+        deal(MKR, address(vault), 10e18);
+
+        vm.expectRevert("sender not minter");
+        vault.delegateMKRLikeTo(DELEGATEE, MKR, delegateAmount);
+    }
+
     function test_delegateTo() public {
         uint256 delegateAmount = 5e18;
         VaultMKR vault = new VaultMKR(VAULT_ID, msg.sender, address(IPMainnet.VAULT_CONTROLLER));
@@ -31,6 +40,21 @@ contract VaultMKRTest is Test {
 
         assertEq(IERC20(MKR).balanceOf(address(vault)), balanceVaultBefore - delegateAmount);
         assertEq(VoteDelegate(DELEGATEE).stake(address(vault)), delegateAmount);
+    }
+
+    function test_undelegateFrom_revertsOnlyMinter() public {
+        uint256 delegateAmount = 5e18;
+        VaultMKR vault = new VaultMKR(VAULT_ID, msg.sender, address(IPMainnet.VAULT_CONTROLLER));
+        deal(MKR, address(vault), 10e18);
+
+        vm.startPrank(msg.sender);
+        vault.delegateMKRLikeTo(DELEGATEE, MKR, delegateAmount);
+        vm.stopPrank();
+
+        assertEq(VoteDelegate(DELEGATEE).stake(address(vault)), delegateAmount);
+
+        vm.expectRevert("sender not minter");
+        vault.undelegateMKRLike(DELEGATEE, delegateAmount);
     }
 
     function test_undelegateFrom_revertsInsufficientStake() public {
@@ -65,6 +89,8 @@ contract VaultMKRTest is Test {
 
         assertEq(IERC20(MKR).balanceOf(address(vault)), balanceVaultBefore - delegateAmount);
         assertEq(VoteDelegate(DELEGATEE).stake(address(vault)), delegateAmount);
+
+        vm.roll(block.number + 1);
 
         vm.startPrank(msg.sender);
         vault.undelegateMKRLike(DELEGATEE, delegateAmount);
