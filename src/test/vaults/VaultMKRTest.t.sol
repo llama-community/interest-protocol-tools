@@ -42,6 +42,32 @@ contract VaultMKRTest is Test {
         assertEq(VoteDelegate(DELEGATEE).stake(address(vault)), delegateAmount);
     }
 
+    function test_delegateTo_multiple() public {
+        address DELEGATEE_TWO = 0xB8dF77C3Bd57761bD0C55D2F873d3Aa89b3dA8B7;
+
+        uint256 delegateAmount = 5e18;
+        VaultMKR vault = new VaultMKR(VAULT_ID, msg.sender, address(IPMainnet.VAULT_CONTROLLER));
+        assertEq(IERC20(MKR).balanceOf(address(vault)), 0);
+        deal(MKR, address(vault), 10e18);
+
+        uint256 balanceVaultBefore = IERC20(MKR).balanceOf(address(vault));
+        assertEq(IERC20(MKR).balanceOf(address(vault)), 10e18);
+
+        vm.startPrank(msg.sender);
+        vault.delegateMKRLikeTo(DELEGATEE, MKR, delegateAmount);
+        vm.stopPrank();
+
+        assertEq(IERC20(MKR).balanceOf(address(vault)), balanceVaultBefore - delegateAmount);
+        assertEq(VoteDelegate(DELEGATEE).stake(address(vault)), delegateAmount);
+
+        vm.startPrank(msg.sender);
+        vault.delegateMKRLikeTo(DELEGATEE_TWO, MKR, delegateAmount);
+        vm.stopPrank();
+
+        assertEq(IERC20(MKR).balanceOf(address(vault)), 0);
+        assertEq(VoteDelegate(DELEGATEE_TWO).stake(address(vault)), delegateAmount);
+    }
+
     function test_undelegateFrom_revertsOnlyMinter() public {
         uint256 delegateAmount = 5e18;
         VaultMKR vault = new VaultMKR(VAULT_ID, msg.sender, address(IPMainnet.VAULT_CONTROLLER));
