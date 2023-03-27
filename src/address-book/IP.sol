@@ -4,10 +4,36 @@ pragma solidity >=0.8.0;
 interface IVaultController {
     function _enabledTokens(uint256 id) external view returns (address);
 
+    ///@notice amount of USDi needed to reach even solvency
+    ///@notice this amount is a moving target and changes with each block as pay_interest is called
+    /// @param id id of vault
+    function amountToSolvency(uint96 id) external view returns (uint256);
+
     /// @notice borrow USDi from a vault. only vault minter may borrow from their vault
     /// @param id vault to borrow against
     /// @param amount amount of USDi to borrow
     function borrowUsdi(uint96 id, uint192 amount) external;
+
+    /// @notice calls the pay interest function
+    /// @dev implementation in pay_interest
+    function calculateInterest() external returns (uint256);
+
+    /// @notice check an vault for over-collateralization. returns false if amount borrowed is greater than borrowing power.
+    /// @param id the vault to check
+    /// @return true = vault over-collateralized; false = vault under-collaterlized
+    function checkVault(uint96 id) external view returns (bool);
+
+    /// @notice liquidate an underwater vault
+    /// @notice vaults may be liquidated up to the point where they are exactly solvent
+    /// @param id the vault to liquidate
+    /// @param assetAddress the token the liquidator wishes to liquidate
+    /// @param tokensToLiquidate  number of tokens to liquidate
+    /// @dev pays interest before liquidation
+    function liquidateVault(
+        uint96 id,
+        address assetAddress,
+        uint256 tokensToLiquidate
+    ) external returns (uint256);
 
     /// @notice create a new vault
     /// @return address of the new vault
@@ -33,6 +59,15 @@ interface IVaultController {
     /// @notice get the amount of tokens regsitered in the system
     /// @return the amount of tokens registered in the system
     function tokensRegistered() external view returns (uint256);
+
+    /// @notice calculate amount of tokens to liquidate for a vault
+    /// @param id the vault to get info for
+    /// @param asset_address the token to calculate how many tokens to liquidate
+    /// @return - amount of tokens liquidatable
+    /// @notice the amount of tokens owed is a moving target and changes with each block as pay_interest is called
+    /// @notice this function can serve to give an indication of how many tokens can be liquidated
+    /// @dev all this function does is call _liquidationMath with 2**256-1 as the amount
+    function tokensToLiquidate(uint96 id, address asset_address) external view returns (uint256);
 
     /// @notice get vault address of id
     /// @return the address of vault

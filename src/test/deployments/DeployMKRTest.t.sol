@@ -10,6 +10,8 @@ import {IPMainnet, IPGovernance} from "../../address-book/IPAddressBook.sol";
 // import {DeployToken} from "../../../script/DeployMKR.s.sol";
 
 contract MKRProposalTest is BaseInterestProtocolTest {
+    address public constant IPT_WHALE = 0x95Bc377F540E504F666671177E5d80bf7c21ab6F;
+    address private constant IPT_VOTING_WHALE_TWO = 0x5fee8d7d02B0cfC08f0205ffd6d6B41877c86558;
     address private constant MKR_WHALE = 0xA9DDA2045D140Eb7CCD30c4EF6B9901CCb279793;
     address private constant underlyingToken = 0x9f8F72aA9304c8B593d555F12eF6589cC3A579A2;
     address private cappedToken;
@@ -28,7 +30,11 @@ contract MKRProposalTest is BaseInterestProtocolTest {
         uint256 proposedCap = 5_400_000;
         uint256 proposalId = _createMKRProposal(underlyingToken, proposedCap);
 
-        _passVoteAndExecute(proposalId);
+        address[] memory voters = new address[](2);
+        voters[0] = IPT_WHALE;
+        voters[1] = IPT_VOTING_WHALE_TWO;
+
+        _passVoteAndExecute(proposalId, voters);
 
         assertEq(IPGovernance.GOV.proposalCount(), 20);
         assertEq(IPMainnet.VAULT_CONTROLLER.tokensRegistered(), 15);
@@ -56,6 +62,8 @@ contract MKRProposalTest is BaseInterestProtocolTest {
         _deposit(token, msg.sender, 1e18, vaultId);
         _borrow(msg.sender, 5e17, vaultId);
         _repay(msg.sender, vaultId);
+
+        _liquidationFlow(token, msg.sender, vaultId);
     }
 
     function _createMKRProposal(address underlying, uint256 proposedCap) internal returns (uint256) {

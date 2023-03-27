@@ -32,7 +32,7 @@ contract VaultMKRTest is Test {
         deal(MKR, address(vault), 10e18);
 
         uint256 balanceVaultBefore = IERC20(MKR).balanceOf(address(vault));
-        assertEq(IERC20(MKR).balanceOf(address(vault)), 10e18);
+        assertEq(balanceVaultBefore, 10e18);
 
         vm.startPrank(msg.sender);
         vault.delegateMKRLikeTo(DELEGATEE, MKR, delegateAmount);
@@ -51,7 +51,7 @@ contract VaultMKRTest is Test {
         deal(MKR, address(vault), 10e18);
 
         uint256 balanceVaultBefore = IERC20(MKR).balanceOf(address(vault));
-        assertEq(IERC20(MKR).balanceOf(address(vault)), 10e18);
+        assertEq(balanceVaultBefore, 10e18);
 
         vm.startPrank(msg.sender);
         vault.delegateMKRLikeTo(DELEGATEE, MKR, delegateAmount);
