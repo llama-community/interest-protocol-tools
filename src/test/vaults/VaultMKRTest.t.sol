@@ -25,6 +25,20 @@ contract VaultMKRTest is Test {
         vault.delegateMKRLikeTo(DELEGATEE, MKR, delegateAmount);
     }
 
+    function test_approveBeforeDelegate_noIssuesWithPriorApproval() public {
+        uint256 delegateAmount = 5e18;
+        VaultMKR vault = new VaultMKR(VAULT_ID, msg.sender, address(IPMainnet.VAULT_CONTROLLER));
+        assertEq(IERC20(MKR).balanceOf(address(vault)), 0);
+        deal(MKR, address(vault), 10e18);
+
+        vm.startPrank(msg.sender);
+        IERC20(MKR).approve(DELEGATEE, 3e18);
+        IERC20(MKR).allowance(msg.sender, DELEGATEE);
+        vault.delegateMKRLikeTo(DELEGATEE, MKR, delegateAmount);
+        IERC20(MKR).allowance(msg.sender, DELEGATEE);
+        vm.stopPrank();
+    }
+
     function test_delegateTo() public {
         uint256 delegateAmount = 5e18;
         VaultMKR vault = new VaultMKR(VAULT_ID, msg.sender, address(IPMainnet.VAULT_CONTROLLER));
