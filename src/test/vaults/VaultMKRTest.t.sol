@@ -31,12 +31,17 @@ contract VaultMKRTest is Test {
         assertEq(IERC20(MKR).balanceOf(address(vault)), 0);
         deal(MKR, address(vault), 10e18);
 
-        vm.startPrank(msg.sender);
+        vm.startPrank(address(vault));
         IERC20(MKR).approve(DELEGATEE, 3e18);
-        IERC20(MKR).allowance(msg.sender, DELEGATEE);
-        vault.delegateMKRLikeTo(DELEGATEE, MKR, delegateAmount);
-        IERC20(MKR).allowance(msg.sender, DELEGATEE);
         vm.stopPrank();
+
+        IERC20(MKR).allowance(msg.sender, DELEGATEE);
+
+        vm.startPrank(msg.sender);
+        vault.delegateMKRLikeTo(DELEGATEE, MKR, delegateAmount);
+        vm.stopPrank();
+
+        IERC20(MKR).allowance(msg.sender, DELEGATEE);
     }
 
     function test_delegateTo() public {
