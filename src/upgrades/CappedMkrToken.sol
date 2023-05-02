@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.9;
 
+import {Test, console2} from "forge-std/Test.sol";
+
 import "ip-contracts/_external/openzeppelin/ERC20Upgradeable.sol";
 import "ip-contracts/_external/openzeppelin/OwnableUpgradeable.sol";
 import "ip-contracts/_external/openzeppelin/Initializable.sol";

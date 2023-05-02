@@ -2,18 +2,19 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
-import "forge-std/console.sol";
 
 import {IERC20} from "ip-contracts/_external/IERC20.sol";
 import {Vault} from "ip-contracts/lending/Vault.sol";
 import {ProposalState} from "ip-contracts/governance/governor/Structs.sol";
 
 import {CappedMkrToken} from "../upgrades/CappedMkrToken.sol";
+import {MKRVotingVault} from "../upgrades/MKRVotingVault.sol";
 import {IPGovernance, IPMainnet} from "../address-book/IPAddressBook.sol";
 
 contract BaseInterestProtocolTest is Test {
     address private constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
     address private constant USDI_WHALE = 0x95Bc377F540E504F666671177E5d80bf7c21ab6F;
+    address internal constant DELEGATEE = 0x4C28d8402ac01E5d623e4A5438535369770Fe407;
 
     function _borrow(
         address user,
@@ -37,6 +38,26 @@ contract BaseInterestProtocolTest is Test {
         vm.startPrank(user);
         Vault(IPMainnet.VAULT_CONTROLLER.vaultAddress(vaultId)).delegateCompLikeTo(to, address(token._underlying()));
         vm.stopPrank();
+    }
+
+    function _delegateMkrLike(
+        CappedMkrToken token,
+        address user,
+        uint96 vaultId,
+        address to,
+        uint256 amount
+    ) internal {
+        uint256 balanceBefore = IERC20(address(token._underlying())).balanceOf(to);
+        vm.startPrank(user);
+        MKRVotingVault(IPMainnet.VAULT_CONTROLLER.vaultAddress(vaultId)).delegateMKRLikeTo(
+            to,
+            address(token._underlying()),
+            amount
+        );
+        vm.stopPrank();
+
+        uint256 balanceAfter = IERC20(address(token._underlying())).balanceOf(to);
+        assertEq(balanceAfter, balanceBefore + amount);
     }
 
     function _deposit(

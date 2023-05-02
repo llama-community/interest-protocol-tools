@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "forge-std/Test.sol";
 import {BaseInterestProtocolTest} from "../BaseInterestProtocolTest.t.sol";
 import {GenericListing} from "../../listings/GenericListing.sol";
 import {IPMainnet, IPGovernance} from "../../address-book/IPAddressBook.sol";
 import {CappedMkrToken} from "../../upgrades/CappedMkrToken.sol";
+import {MKRVotingVaultController} from "../../upgrades/MKRVotingVaultController.sol";
 
 // import {DeployToken} from "../../../script/DeployMKR.s.sol";
 
@@ -50,7 +50,10 @@ contract MKRProposalTest is BaseInterestProtocolTest {
         vm.startPrank(msg.sender);
         IPMainnet.VAULT_CONTROLLER.mintVault();
         uint96 vaultId = IPMainnet.VAULT_CONTROLLER.vaultsMinted();
-        IPMainnet.VOTING_VAULT_CONTROLLER.mintVault(vaultId);
+
+        MKRVotingVaultController votingVaultController = new MKRVotingVaultController();
+        votingVaultController.initialize(address(IPMainnet.VAULT_CONTROLLER));
+        votingVaultController.mintVault(vaultId);
         vm.stopPrank();
 
         _deposit(token, msg.sender, 1e18, vaultId);
@@ -64,6 +67,8 @@ contract MKRProposalTest is BaseInterestProtocolTest {
         _repay(msg.sender, vaultId);
 
         _liquidationFlow(token, msg.sender, vaultId);
+
+        _delegateMkrLike(token, msg.sender, vaultId, DELEGATEE, 1e18);
     }
 
     function _createMKRProposal(address underlying, uint256 proposedCap) internal returns (uint256) {

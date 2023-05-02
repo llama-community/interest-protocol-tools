@@ -172,4 +172,52 @@ contract VaultMKRTest is Test {
         assertEq(IERC20(MKR).balanceOf(address(votingVault)), balanceVaultBefore);
         assertEq(VoteDelegate(DELEGATEE).stake(address(votingVault)), 0);
     }
+
+    function test_controllerTransfer_revertsIfNotValidSender() public {
+        MKRVotingVault votingVault = new MKRVotingVault(
+            VAULT_ID,
+            address(vault),
+            address(IPMainnet.VAULT_CONTROLLER),
+            address(votingVaultController)
+        );
+        vm.expectRevert(MKRVotingVault.OnlyVaultController.selector);
+        votingVault.controllerTransfer(MKR, makeAddr("new-address"), 1e18);
+    }
+
+    function test_controllerTransfer_success() public {
+        MKRVotingVault votingVault = new MKRVotingVault(
+            VAULT_ID,
+            address(vault),
+            address(IPMainnet.VAULT_CONTROLLER),
+            address(votingVaultController)
+        );
+        deal(MKR, address(votingVault), 10e18);
+        address receiver = makeAddr("new-address");
+
+        assertEq(IERC20(MKR).balanceOf(receiver), 0);
+
+        vm.startPrank(address(IPMainnet.VAULT_CONTROLLER));
+        votingVault.controllerTransfer(MKR, receiver, 1e18);
+        vm.stopPrank();
+
+        assertEq(IERC20(MKR).balanceOf(receiver), 1e18);
+    }
+
+    function test_votingVaultControllerTransfer_revertsIfNotValidSender() public {
+        MKRVotingVault votingVault = new MKRVotingVault(
+            VAULT_ID,
+            address(vault),
+            address(IPMainnet.VAULT_CONTROLLER),
+            address(votingVaultController)
+        );
+        deal(MKR, address(votingVault), 10e18);
+        address receiver = makeAddr("new-address");
+        assertEq(IERC20(MKR).balanceOf(receiver), 0);
+
+        vm.startPrank(address(votingVaultController));
+        votingVault.votingVaultControllerTransfer(MKR, receiver, 1e18);
+        vm.stopPrank();
+
+        assertEq(IERC20(MKR).balanceOf(receiver), 1e18);
+    }
 }
