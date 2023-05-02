@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {Test, console2} from "forge-std/Test.sol";
-
+import {Test} from "forge-std/Test.sol";
 import {IERC20} from "ip-contracts/_external/IERC20.sol";
 
 import {CappedMkrToken} from "../../upgrades/CappedMkrToken.sol";
