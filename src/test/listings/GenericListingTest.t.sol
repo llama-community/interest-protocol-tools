@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
-import {CappedGovToken} from "ip-contracts/lending/CappedGovToken.sol";
+
 import {ChainlinkOracleRelay} from "ip-contracts/oracle/External/ChainlinkOracleRelay.sol";
 import {ChainlinkTokenOracleRelay} from "ip-contracts/oracle/External/ChainlinkTokenOracleRelay.sol";
 import {UniswapV3OracleRelay} from "ip-contracts/oracle/External/UniswapV3OracleRelay.sol";
@@ -11,6 +11,7 @@ import {AnchoredViewV2} from "ip-contracts/oracle/Logic/AnchoredViewV2.sol";
 
 import {GenericListing} from "../../listings/GenericListing.sol";
 import {IPGovernance, IPMainnet} from "../../address-book/IPAddressBook.sol";
+import {CappedMkrToken} from "../../upgrades/CappedMkrToken.sol";
 
 contract GenericListingTest is Test {
     address public constant IPT_WHALE = 0x95Bc377F540E504F666671177E5d80bf7c21ab6F;
@@ -47,7 +48,7 @@ contract DeployCappedtoken is GenericListingTest {
         address cappedToken = GenericListing.deployCappedToken(
             GenericListing.ListingData({tokenName: "1INCH", underlying: ONEINCH, cap: proposedCap})
         );
-        CappedGovToken token = CappedGovToken(cappedToken);
+        CappedMkrToken token = CappedMkrToken(cappedToken);
         assertEq(token.getCap(), proposedCap * 1e18);
         assertEq(address(token._underlying()), ONEINCH);
         assertEq(keccak256(abi.encodePacked("Capped 1INCH")), keccak256(abi.encodePacked(token.name())));

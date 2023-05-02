@@ -3,9 +3,9 @@ pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
 import {BaseInterestProtocolTest} from "../BaseInterestProtocolTest.t.sol";
-import {CappedGovToken} from "ip-contracts/lending/CappedGovToken.sol";
 import {GenericListing} from "../../listings/GenericListing.sol";
 import {IPMainnet, IPGovernance} from "../../address-book/IPAddressBook.sol";
+import {CappedMkrToken} from "../../upgrades/CappedMkrToken.sol";
 
 // import {DeployToken} from "../../../script/DeployMKR.s.sol";
 
@@ -41,7 +41,7 @@ contract MKRProposalTest is BaseInterestProtocolTest {
 
         address newToken = IPMainnet.VAULT_CONTROLLER._enabledTokens(14);
 
-        CappedGovToken token = CappedGovToken(newToken);
+        CappedMkrToken token = CappedMkrToken(newToken);
         assertEq(token.getCap(), proposedCap * 1e18);
         assertEq(address(token._underlying()), underlyingToken);
         assertEq(keccak256(abi.encodePacked("Capped MKR")), keccak256(abi.encodePacked(token.name())));

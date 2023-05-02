@@ -5,10 +5,10 @@ import "forge-std/Test.sol";
 import "forge-std/console.sol";
 
 import {IERC20} from "ip-contracts/_external/IERC20.sol";
-import {CappedGovToken} from "ip-contracts/lending/CappedGovToken.sol";
 import {Vault} from "ip-contracts/lending/Vault.sol";
 import {ProposalState} from "ip-contracts/governance/governor/Structs.sol";
 
+import {CappedMkrToken} from "../upgrades/CappedMkrToken.sol";
 import {IPGovernance, IPMainnet} from "../address-book/IPAddressBook.sol";
 
 contract BaseInterestProtocolTest is Test {
@@ -29,7 +29,7 @@ contract BaseInterestProtocolTest is Test {
     }
 
     function _delegate(
-        CappedGovToken token,
+        CappedMkrToken token,
         address user,
         uint96 vaultId,
         address to
@@ -40,7 +40,7 @@ contract BaseInterestProtocolTest is Test {
     }
 
     function _deposit(
-        CappedGovToken token,
+        CappedMkrToken token,
         address user,
         uint256 amount,
         uint96 vaultId
@@ -56,7 +56,7 @@ contract BaseInterestProtocolTest is Test {
     }
 
     function _liquidationFlow(
-        CappedGovToken token,
+        CappedMkrToken token,
         address user,
         uint96 vaultId
     ) public {
@@ -97,7 +97,7 @@ contract BaseInterestProtocolTest is Test {
     }
 
     function _withdraw(
-        CappedGovToken token,
+        CappedMkrToken token,
         address user,
         uint96 vaultId
     ) internal {
@@ -137,7 +137,7 @@ contract BaseInterestProtocolTest is Test {
     }
 
     function _liquidate(
-        CappedGovToken token,
+        CappedMkrToken token,
         address user,
         uint96 vaultId
     ) private {
@@ -159,7 +159,7 @@ contract BaseInterestProtocolTest is Test {
         assertApproxEqAbs(cappedTokenBalance - tokensToLiquidate, token.balanceOf(user), 1e18);
     }
 
-    function _increaseInterestRate(CappedGovToken token) private {
+    function _increaseInterestRate(CappedMkrToken token) private {
         address newUser = makeAddr("new-borrowing-user");
         vm.startPrank(newUser);
         IPMainnet.VAULT_CONTROLLER.mintVault();

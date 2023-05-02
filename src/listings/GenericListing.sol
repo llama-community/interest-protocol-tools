@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import {CappedMkrToken} from "../upgrades/CappedMkrToken.sol";
 import {IPMainnet, IPGovernance} from "../address-book/IPAddressBook.sol";
-import {CappedGovToken} from "ip-contracts/lending/CappedGovToken.sol";
 import {TransparentUpgradeableProxy} from "ip-contracts/_external/ozproxy/transparent/TransparentUpgradeableProxy.sol";
 import {ChainlinkOracleRelay} from "ip-contracts/oracle/External/ChainlinkOracleRelay.sol";
 import {ChainlinkTokenOracleRelay} from "ip-contracts/oracle/External/ChainlinkTokenOracleRelay.sol";
@@ -93,9 +93,9 @@ library GenericListing {
         if (data.cap == 0) {
             revert InvalidCap();
         }
-        CappedGovToken token = new CappedGovToken();
+        CappedMkrToken token = new CappedMkrToken();
         TransparentUpgradeableProxy proxy = new TransparentUpgradeableProxy(address(token), IPMainnet.PROXY_ADMIN, "");
-        CappedGovToken cappedToken = CappedGovToken(address(proxy));
+        CappedMkrToken cappedToken = CappedMkrToken(address(proxy));
         string memory name = string(string.concat("Capped ", bytes(data.tokenName)));
         string memory symbol = string(string.concat("c", bytes(data.tokenName)));
 
